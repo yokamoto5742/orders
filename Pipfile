@@ -8,6 +8,8 @@ fastapi = "*"
 uvicorn = "*"
 validator = "*"
 pyyaml = "*"
+sqlalchemy = "*"
+alembic = "*"
 
 [dev-packages]
 
