@@ -1,3 +1,8 @@
+import requests
+
+from orders.orders_service.exceptions import (APIIntegrationError, InvalidActionError)
+
+
 class OrderItem:
     def __init__(self, id, product, quantity, size):
         self.id = id
@@ -27,3 +32,43 @@ class Order:
     @property
     def status(self):
         return self._status or self._order.status
+
+    def cancel(self):
+        if self.status =='progress':
+            kitchen_base_url = "http://localhost:3000/kitchen"
+            response = requests.post(
+                f'{kitchen_base_url}/schedules/{self.scheduled_id}/cancel', json={"order": [item.dict() for item in self.items]}
+            )
+
+            if response.status_code == 200:
+                return
+
+            raise APIIntegrationError(
+                "could not cancel order with id {self.id}"
+            )
+
+        if self.status == 'delivery':
+            raise InvalidActionError(
+                "Cannot cancel order with id {self.id}"
+            )
+
+    def pay(self):
+        response = requests.post(
+            f'http://localhost:3001/payments', json={"order_id": self.id}
+        )
+        if response.status_code == 201:
+            return
+        raise APIIntegrationError(
+            "could not process payment for order with id {self.id}"
+        )
+
+    def schedule(self):
+        response = requests.post(
+            f'http://localhost:3000/kitchen/schedules', json={"order": [item.dict() for item in self.items]}
+        )
+
+        if response.status_code == 201:
+            return response.json()['id']
+        raise APIIntegrationError(
+            "could not schedule order with id {self.id}"
+        )
