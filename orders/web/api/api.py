@@ -1,8 +1,4 @@
-import uuid
 from uuid import UUID
-from datetime import datetime
-from typing import List, Optional
-
 from fastapi import HTTPException
 from starlette import status
 from starlette.responses import Response
@@ -56,8 +52,9 @@ def get_order(order_id: UUID):
         return order.dict()
     except OrderNotFoundError:
         raise HTTPException(
-            status_code=404,  detail=f'Order with ID {order_id} not found'
+            status_code=404, detail=f'Order with ID {order_id} not found'
         )
+
 
 @app.put('/orders/{order_id}', response_model=GetOrderSchema)
 def update_order(order_id: UUID, order_details: CreateOrderSchema):
@@ -75,7 +72,7 @@ def update_order(order_id: UUID, order_details: CreateOrderSchema):
         return order.dict()
     except OrderNotFoundError:
         raise HTTPException(
-            status_code=404,  detail=f'Order with ID {order_id} not found'
+            status_code=404, detail=f'Order with ID {order_id} not found'
         )
 
 
@@ -90,7 +87,7 @@ def delete_order(order_id: UUID):
         return
     except OrderNotFoundError:
         raise HTTPException(
-            status_code=404,  detail=f'Order with ID {order_id} not found'
+            status_code=404, detail=f'Order with ID {order_id} not found'
         )
 
 
@@ -105,8 +102,9 @@ def cancel_order(order_id: UUID):
         return order.dict()
     except OrderNotFoundError:
         raise HTTPException(
-            status_code=404,  detail=f'Order with ID {order_id} not found'
+            status_code=404, detail=f'Order with ID {order_id} not found'
         )
+
 
 @app.post('/orders/{order_id}/pay', response_model=GetOrderSchema)
 def pay_order(order_id: UUID):
@@ -119,5 +117,5 @@ def pay_order(order_id: UUID):
         return order.dict()
     except OrderNotFoundError:
         raise HTTPException(
-            status_code=404,  detail=f'Order with ID {order_id} not found'
+            status_code=404, detail=f'Order with ID {order_id} not found'
         )
