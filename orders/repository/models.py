@@ -37,6 +37,7 @@ class OrderItemModel(Base):
     __tablename__ = 'order_items'
 
     id = Column(String, primary_key=True, default=generate_uuid)
+    user_id = Column(String, nullable=False)
     order_id = Column(Integer, ForeignKey('orders.id'))
     product = Column(String, nullable=False)
     size = Column(String, nullable=False)
