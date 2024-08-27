@@ -16,6 +16,7 @@ from jwt import (
 
 from starlette import status
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
@@ -77,5 +78,13 @@ class AuthorizeRequestMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 app.add_middleware(AuthorizeRequestMiddleware)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 from orders.web.api import api
