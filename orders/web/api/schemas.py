@@ -1,48 +1,52 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Any
+from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
-from typing_extensions import Annotated
+from pydantic import BaseModel, Field, ConfigDict, NonNegativeInt, model_validator
 
 
 class Size(Enum):
-    small = 'small'
-    medium = 'medium'
-    big = 'big'
+    small = "small"
+    medium = "medium"
+    big = "big"
 
 
-class StatusEnum(Enum):
-    created = 'created'
-    paid = 'paid'
-    progress = 'progress'
-    cancelled = 'cancelled'
-    dispatched = 'dispatched'
-    delivered = 'delivered'
+class Status(Enum):
+    created = "created"
+    paid = "paid"
+    progress = "progress"
+    cancelled = "cancelled"
+    dispatched = "dispatched"
+    delivered = "delivered"
 
 
 class OrderItemSchema(BaseModel):
     product: str
     size: Size
-    quantity: Annotated[int, Field(ge=1, strict=True)] = 1
+    quantity: NonNegativeInt = Field(default=1, gt=0)
 
-    @field_validator('quantity')
-    @classmethod
-    def quantity_non_nullable(cls, value: Any) -> Any:
-        assert value is not None, 'quantity may not be None'
-        return value
+    model_config = ConfigDict(extra="forbid")
+
+    @model_validator(mode="after")
+    def quantity_non_nullable(self):
+        assert self.quantity is not None, "quantity may not be None"
+        return self
 
 
 class CreateOrderSchema(BaseModel):
-    order: Annotated[List[OrderItemSchema], Field(min_length=1)]
+    order: List[OrderItemSchema] = Field(..., min_length=1)
+
+    model_config = ConfigDict(extra="forbid")
 
 
-class GetOrderSchema(BaseModel):
+class GetOrderSchema(CreateOrderSchema):
     id: UUID
-    status: StatusEnum
     created: datetime
+    status: Status
 
 
 class GetOrdersSchema(BaseModel):
     orders: List[GetOrderSchema]
+
+    model_config = ConfigDict(extra="forbid")

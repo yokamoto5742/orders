@@ -6,7 +6,7 @@ def delete_all_orders():
     # SQLite データベースの URL を直接指定
     db_url = 'sqlite:///orders.db'
 
-    with UnitOfWork(db_url) as unit_of_work:
+    with UnitOfWork() as unit_of_work:
         orders_repository = OrdersRepository(unit_of_work.session)
         orders = orders_repository.list()
         for order in orders:

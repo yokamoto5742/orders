@@ -9,7 +9,7 @@ class OrdersRepository:
     def add(self, items, user_id):
         record = OrderModel(
             items=[OrderItemModel(**item) for item in items],
-            user_id=user_id
+            user_id=user_id,
         )
         self.session.add(record)
         return Order(**record.dict(), order_=record)
@@ -17,7 +17,8 @@ class OrdersRepository:
     def _get(self, id_, **filters):
         return (
             self.session.query(OrderModel)
-            .filter(OrderModel.id == str(id_)).fillter_by(**filters)
+            .filter(OrderModel.id == str(id_))
+            .filter_by(**filters)
             .first()
         )
 
@@ -28,24 +29,21 @@ class OrdersRepository:
 
     def list(self, limit=None, **filters):
         query = self.session.query(OrderModel)
-        if 'cancelled' in filters:
-            cancelled = filters.pop('cancelled')
+        if "cancelled" in filters:
+            cancelled = filters.pop("cancelled")
             if cancelled:
-                query = query.filter(OrderModel.status == 'cancelled')
+                query = query.filter(OrderModel.status == "cancelled")
             else:
-                query = query.filter(OrderModel.status != 'cancelled')
-
-        records = query.fillter_by(**filters).limit(limit).all()
+                query = query.filter(OrderModel.status != "cancelled")
+        records = query.filter_by(**filters).limit(limit).all()
         return [Order(**record.dict()) for record in records]
 
     def update(self, id_, **payload):
         record = self._get(id_)
-        if 'items' in payload:
+        if "items" in payload:
             for item in record.items:
                 self.session.delete(item)
-            record.items = [
-                OrderItemModel(**item) for item in payload.pop('items')
-            ]
+            record.items = [OrderItemModel(**item) for item in payload.pop("items")]
         for key, value in payload.items():
             setattr(record, key, value)
         return Order(**record.dict())
