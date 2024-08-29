@@ -13,6 +13,7 @@ alembic = "*"
 requests = "*"
 cryptography = "*"
 pyjwt = "*"
+optional = "*"
 
 [dev-packages]
 
